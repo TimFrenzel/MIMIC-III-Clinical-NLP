@@ -1,0 +1,41 @@
+# Core dependencies
+duckdb
+pandas
+numpy
+tqdm
+gensim
+scikit-learn
+matplotlib
+seaborn
+networkx
+umap-learn  # Optional: for advanced dimensionality reduction
+matplotlib-venn  # For Venn diagrams in model comparison
+json
+gc
+warnings
+random
+pathlib
+collections
+datetime
+packaging
+pydantic
+
+# Machine Learning and Deep Learning
+torch
+torchvision
+torchaudio
+transformers
+cudatoolkit==11.8
+cudnn
+pytorch-cuda==11.8
+
+# NLP and medical entity extraction
+spacy==3.4.4
+scispacy==0.5.1
+medspacy
+pycontext
+
+# Specific SpaCy Models
+spacy-models/en_core_web_sm
+https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.1/en_core_sci_md-0.5.1.tar.gz
+https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.1/en_ner_bc5cdr_md-0.5.1.tar.gz

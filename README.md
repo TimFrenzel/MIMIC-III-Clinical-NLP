@@ -9,25 +9,42 @@ An advanced NLP pipeline leveraging spaCy, SciSpacy, MedSpacy, and ClinicalBERT 
 - **Word Embeddings & Semantic Analysis**: Trains custom Word2Vec embeddings on extracted entities or loads pre-trained embeddings from Gensim.
 - **Relationship Extraction & Knowledge Graphs**: Identifies subject-verb-object relationships and constructs knowledge graphs using NetworkX.
 - **Advanced Visualization**: Provides t-SNE embeddings, entity overlap plots, contextual attribute displays, and dependency parsing visualizations.
+- **GPU Acceleration**: Leverages CUDA-enabled hardware for efficient deep learning-based text processing.
 
 ## Installation
 ### Prerequisites
-Ensure Python 3.8+ is installed, along with the necessary dependencies:
+Ensure Python 3.10+ is installed, along with the necessary dependencies. It is recommended to use a Conda environment for dependency management.
 
 ```bash
-conda install python=3.8 duckdb pandas numpy spacy scispacy gensim matplotlib scikit-learn tqdm networkx seaborn 
-pip install medspacy  # Optional for clinical-specific NLP processing
-```
+# 1. Create and activate the conda environment
+conda create -n mimic_spacy python=3.10 -y
+conda activate mimic_spacy
 
-Download relevant SpaCy/SciSpacy models:
-```bash
+# 2. Install essential libraries via conda-forge
+conda install -c conda-forge duckdb gensim scikit-learn matplotlib -y
+conda install -c conda-forge pandas numpy tqdm networkx seaborn umap-learn matplotlib-venn -y
+
+# 3. Install CUDA support for GPU acceleration
+conda install -c conda-forge cudatoolkit=11.8 -y
+conda install -c conda-forge cudnn -y
+conda install -c conda-forge pytorch torchvision torchaudio pytorch-cuda=11.8 -y
+
+# 4. Install specific spaCy version (NOT via conda to ensure version control)
+pip install spacy==3.4.4
+
+# 5. Install base spaCy model
 python -m spacy download en_core_web_sm
-python -m spacy download en_ner_bc5cdr_md
-```
 
-(Optional) Install UMAP for advanced dimensionality reduction:
-```bash
-pip install umap-learn
+# 6. Install specific scispacy version and models
+pip install scispacy==0.5.1
+pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.1/en_core_sci_md-0.5.1.tar.gz
+pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.1/en_ner_bc5cdr_md-0.5.1.tar.gz
+
+# 7. Install transformers for ClinicalBERT
+conda install -c conda-forge transformers -y
+
+# 8. Verify installation
+python -c "import spacy; import scispacy; import torch; print(f'SpaCy version: {spacy.__version__}'); print(f'GPU Available: {torch.cuda.is_available()}')"
 ```
 
 ## Usage
@@ -57,35 +74,18 @@ Adjust flags as needed. Logs, outputs, and generated plots will be stored in the
 └── ...
 ```
 
+## Data Access Requirement
+This project utilizes clinical text data from the **MIMIC-III** database, which contains de-identified electronic health records from critical care units. **Access to MIMIC-III is restricted** and requires credentialed access through **PhysioNet**. To use this dataset:
+
+1. Register for an account at [PhysioNet](https://physionet.org/)
+2. Complete the required training on data usage ethics and privacy
+3. Request access to the [MIMIC-III dataset](https://physionet.org/content/mimiciii/1.4/)
+4. Once granted access, download the relevant ICU note files for processing
+
+Without valid access, users will not be able to retrieve and analyze clinical notes. Please ensure compliance with all ethical and legal requirements when handling sensitive medical data.
+
 ## GPU Utilization
 This project leverages GPU acceleration where available to optimize NLP model inference times. The use of ClinicalBERT and other transformer-based models benefits from CUDA-enabled hardware, significantly reducing computation time for entity extraction and embedding generation.
-
-## **Initial Key Findings**
-
-### **Entity Visualization Plot**
-This NER visualization highlights key medical terms in an ICU clinical note, categorizing diseases (red) and medications (orange) relevant to sepsis management. Conditions like encephalopathy, pain, and bleeding suggest potential complications, while medications such as lidocaine, fentanyl, and lactulose indicate pain management and gastrointestinal support. Extracting these entities from unstructured text aids NLP-based sepsis detection models in automated diagnosis and treatment tracking.
-
-![Entity Visualization](output/entity_doc_2.jpg)
-
-### **Dependency Parse**
-This dependency parse visualizes the syntactic structure of a clinical statement, highlighting key relationships between INR and fibrinogen levels. The phrase indicates that INR is increasing (to 6.2), while fibrinogen is dropping (to 68), which may signal coagulopathy, a critical concern in sepsis. Such parsing aids NLP models in extracting lab trends for automated sepsis progression monitoring.
-
-![Dependency Parse](output/dependency_0.jpg)
-
-### **Knowledge Graph of Entity Relationships**
-This knowledge graph visualizes entity relationships in ICU clinical notes, revealing a dense network where key terms such as flowsheet, patient, urine, and ABG act as central hubs. The high connectivity suggests complex interactions between lab results, physiological measurements, and treatment plans, which is valuable for sepsis progression tracking. Such a structure helps NLP models improve entity extraction and contextual understanding in clinical decision support.
-
-![Knowledge Graph](output/relationship_knowledge_graph.png)
-
-### **Dimensionality Reduction Comparison**
-The t-SNE, PCA, and UMAP visualizations compare different dimensionality reduction techniques for clinical text embeddings, revealing how terms related to sepsis and ICU treatment cluster in different spaces. t-SNE shows more localized groupings of related terms (e.g., pain, propofol, fentanyl), while PCA maintains a broader distribution with some separation between concepts. UMAP appears to create a linear structure, which may indicate a progression in disease severity or treatment stages, potentially aiding in sepsis classification.
-
-![Dimensionality Reduction](output/dimensionality_reduction_comparison.png)
-
-### **Entity Overlap Venn Diagram**
-The Venn diagram compares entity recognition overlap among SpaCy, SciSpaCy, and MedSpaCy, highlighting significant differences in their extracted medical terms. SpaCy identifies the largest number of entities, but its overlap with SciSpaCy is limited (956 shared entities), suggesting that general NLP models may not be optimized for clinical text. MedSpaCy, specifically designed for medical contexts, captures very few entities (14 total), indicating that it may be overly restrictive or tuned for high specificity in clinical NLP applications.
-
-![Entity Overlap](output/entity_overlap_venn.png)
 
 ## License
 This project is distributed under the MIT License.
