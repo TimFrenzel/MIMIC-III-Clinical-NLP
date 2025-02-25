@@ -70,7 +70,7 @@ Adjust flags as needed. Logs, outputs, and generated plots will be stored in the
 ├── mimic_nlp.py        # Main NLP pipeline script
 ├── README.md           # Documentation
 ├── requirements.txt    # Dependencies
-├── results/            # Default output folder
+├── output/             # Default output folder
 └── ...
 ```
 
